@@ -1,0 +1,20 @@
+service: bookings-consumer
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+  stage: dev
+  region: us-east-1
+
+functions:
+  stream_listener:
+    handler: handler.listen
+    role: ${ssm:${self:custom.stage}-bookings-stream-consumer-iam-role}
+    events:
+     - stream: ${ssm:${self:custom.stage}-dynamodb-bookings-stream}
+    environment:
+      SNS_NOTIFICATIONS_TOPIC: ${ssm:${self:custom.stage}-notification-topic}
+
+custom:
+  stage: ${opt:stage, self:provider.stage}

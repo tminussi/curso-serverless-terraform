@@ -1,0 +1,62 @@
+service: api
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+  stage: dev
+  region: us-east-1
+
+functions:
+  register:
+    role: ${ssm:${self:custom.stage}-register-iam-role}
+    handler: register/handler.register
+    environment:
+      DYNAMODB_USERS: ${ssm:${self:custom.stage}-dynamodb-users-table}
+    
+    events:
+     - http:
+         path: users
+         method: post
+
+  login:
+    role: ${ssm:${self:custom.stage}-login-iam-role}
+    handler: login/handler.login
+    environment:
+      DYNAMODB_USERS: ${ssm:${self:custom.stage}-dynamodb-users-table}
+      JWT_SECRET: ${ssm:${self:custom.stage}-jwt-secret}
+      EMAIL_GSI: ${ssm:${self:custom.stage}-email-gsi}
+    events:
+     - http:
+         path: login
+         method: post
+
+  create_booking:
+    role: ${ssm:${self:custom.stage}-create-booking-iam-role}
+    handler: create-booking/handler.create
+    environment:
+      DYNAMODB_BOOKINGS: ${ssm:${self:custom.stage}-dynamodb-bookings-table}
+    events:
+     - http:
+         path: bookings
+         method: post
+         authorizer: authorizer
+
+  list_bookings:
+    role: ${ssm:${self:custom.stage}-list-bookings-iam-role}
+    handler: list-bookings/handler.list
+    environment:
+      DYNAMODB_BOOKINGS: ${ssm:${self:custom.stage}-dynamodb-bookings-table}
+    events:
+     - http:
+         path: bookings
+         method: get
+         authorizer: authorizer
+
+  authorizer:
+    handler: authorizer/handler.authorizer
+    environment:
+      JWT_SECRET: ${ssm:${self:custom.stage}-jwt-secret}
+         
+custom:
+  stage: ${opt:stage, self:provider.stage}
