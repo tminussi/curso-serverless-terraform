@@ -10,9 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "uuid": "^3.3.2"
+    "uuid": "^8.1.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.496.0"
+    "aws-sdk": "^2.683.0"
   }
 }

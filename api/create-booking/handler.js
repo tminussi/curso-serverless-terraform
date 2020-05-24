@@ -4,14 +4,14 @@ AWS.config.update({
 })
 const documentClient = new AWS.DynamoDB.DocumentClient()
 
-const uuid = require('uuid/v4')
+const { v4: uuidv4 } = require('uuid');
 
 module.exports.create = async event => {
     const body = JSON.parse(event.body)
     await documentClient.put({
         TableName: process.env.DYNAMODB_BOOKINGS,
         Item: {
-            id: uuid(),
+            id: uuidv4(),
             date: body.date,
             user: event.requestContext.authorizer
         }
